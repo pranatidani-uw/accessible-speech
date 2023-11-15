@@ -185,6 +185,7 @@ async function getGPTResult(_promptToRetry, _uniqueIdToRetry) {
             responseElement.innerHTML = `<img src="${responseText}" class="ai-image" alt="generated image"/>`
         } else {
             // Set the response text
+            // parse and make changes
             responseElement.innerHTML = converter.makeHtml(responseText.trim());
         }
 
