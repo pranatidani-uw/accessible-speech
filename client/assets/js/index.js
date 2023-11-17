@@ -1,7 +1,10 @@
+import OpenAI from "openai";
 const API_URL = '/';
 const converter = new showdown.Converter();
 let promptToRetry = null;
 let uniqueIdToRetry = null;
+let OPENAI_API_KEY = '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';
+// const OpenAI = require('openai');
 
 const submitButton = document.getElementById('submit-button');
 const regenerateResponseButton = document.getElementById('regenerate-response-button');
@@ -208,134 +211,170 @@ async function getGPTResult(_promptToRetry, _uniqueIdToRetry) {
     // // Set isGeneratingResponse to true
     // isGeneratingResponse = true;
 
-    try {
-        const model = "chatgpt"
-        // Send a POST request to the API with the prompt in the request body
-        const prompt = "does this presentation script have a self introduction where they are describing themselves including name, hair color, clothes, and gender: " + input + ". Answer with yes or no, and what parts they are missing. Be lenient, if they have one or the other it is fine.";
-        const response = await fetch(API_URL + 'get-prompt-result', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                prompt,
-                model
-            })
-        });
-        if (!response.ok) {
-            setRetryResponse(prompt, uniqueId);
+    // try {
+    //     const model = "gpt-4-1106-preview"
+    //     // Send a POST request to the API with the prompt in the request body
+    //     const prompt = "does this presentation script have a self introduction where they are describing themselves including name, hair color, clothes, and gender: " + input + ". Answer with yes or no, and what parts they are missing. Be lenient, if they have one or the other it is fine.";
+    //     const response = await fetch(API_URL + 'get-prompt-result', {
+    //         method: 'POST',
+    //         headers: { 'Content-Type': 'application/json' },
+    //         body: JSON.stringify({
+    //             prompt,
+    //             model
+    //         })
+    //     });
+    //     if (!response.ok) {
+    //         setRetryResponse(prompt, uniqueId);
         
-            // Get additional details from the response
-            let errorMessage = `HTTP Error: ${response.status} - ${response.statusText}`;
+    //         // Get additional details from the response
+    //         let errorMessage = `HTTP Error: ${response.status} - ${response.statusText}`;
         
-            try {
-                // Attempt to parse the response body as JSON for more details
-                const responseBody = await response.json();
-                errorMessage += `\n${JSON.stringify(responseBody, null, 2)}`;
-            } catch (error) {
-                // If parsing as JSON fails, use the raw response text
-                errorMessage += `\n${await response.text()}`;
-            }
+    //         try {
+    //             // Attempt to parse the response body as JSON for more details
+    //             const responseBody = await response.json();
+    //             errorMessage += `\n${JSON.stringify(responseBody, null, 2)}`;
+    //         } catch (error) {
+    //             // If parsing as JSON fails, use the raw response text
+    //             errorMessage += `\n${await response.text()}`;
+    //         }
         
-            setErrorForResponse(responseElement, errorMessage);
-            return;
-        }
+    //         setErrorForResponse(responseElement, errorMessage);
+    //         return;
+    //     }
         
-        const responseText = await response.text();
-        // if (model === 'image') {
-        //     // Show image for `Create image` model
-        //     responseElement.innerHTML = `<img src="${responseText}" class="ai-image" alt="generated image"/>`
-        // } else {
-            // Set the response text
-            // -- parse and make changes
-            //responseElement.innerHTML = converter.makeHtml(responseText.trim());
-            console.log(responseText);
-            var resultElement = document.getElementById('result-container');
-            if (resultElement) {
-                resultElement.textContent = responseText;
-            }
-        // }
+    //     const responseText = await response.text();
+    //     // if (model === 'image') {
+    //     //     // Show image for `Create image` model
+    //     //     responseElement.innerHTML = `<img src="${responseText}" class="ai-image" alt="generated image"/>`
+    //     // } else {
+    //         // Set the response text
+    //         // -- parse and make changes
+    //         //responseElement.innerHTML = converter.makeHtml(responseText.trim());
+    //         console.log(responseText);
+    //         var resultElement = document.getElementById('result-container');
+    //         if (resultElement) {
+    //             resultElement.textContent = responseText;
+    //         }
+    //     // }
 
-        // promptToRetry = null;
-        // uniqueIdToRetry = null;
-        // regenerateResponseButton.style.display = 'none';
-        // setTimeout(() => {
-        //     // Scroll to the bottom of the response list
-        //     responseList.scrollTop = responseList.scrollHeight;
-        //     hljs.highlightAll();
-        // }, 10);
-    } catch (err) {
-        // setRetryResponse(prompt, uniqueId);
-        // // If there's an error, show it in the response element
-        // setErrorForResponse(responseElement, `Error: ${err.message}`);
-    } finally {
-        // Set isGeneratingResponse to false
-        // isGeneratingResponse = false;
+    //     // promptToRetry = null;
+    //     // uniqueIdToRetry = null;
+    //     // regenerateResponseButton.style.display = 'none';
+    //     // setTimeout(() => {
+    //     //     // Scroll to the bottom of the response list
+    //     //     responseList.scrollTop = responseList.scrollHeight;
+    //     //     hljs.highlightAll();
+    //     // }, 10);
+    // } catch (err) {
+    //     // setRetryResponse(prompt, uniqueId);
+    //     // // If there's an error, show it in the response element
+    //     // setErrorForResponse(responseElement, `Error: ${err.message}`);
+    // } finally {
+    //     // Set isGeneratingResponse to false
+    //     // isGeneratingResponse = false;
 
-        // // Remove the loading class from the submit button
-        // submitButton.classList.remove("loading");
+    //     // // Remove the loading class from the submit button
+    //     // submitButton.classList.remove("loading");
 
-        // // Clear the loader interval
-        // clearInterval(loadInterval);
-    }
+    //     // // Clear the loader interval
+    //     // clearInterval(loadInterval);
+    // }
     if(imageAmount > 0){
         try {
-            const model = "chatgpt"
-            // Send a POST request to the API with the prompt in the request body
-            
-            const prompt = "no matter what the images are, does this presentation have " +imageAmount + " descriptions for images"+ + input + ". an image description starts with 'this image shows' or something similar how many descriptions they are missing. consider each time the prompt includes 'this image shows' as one image description. you dont need t know what the image looks like. just make sure there's a description of the image that starts with 'this image contains' or smth very similar ";
-            const response = await fetch(API_URL + 'get-prompt-result', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    prompt,
-                    model
-                })
-            });
-            if (!response.ok) {
-                setRetryResponse(prompt, uniqueId);
-            
-                // Get additional details from the response
-                let errorMessage = `HTTP Error: ${response.status} - ${response.statusText}`;
-            
-                try {
-                    // Attempt to parse the response body as JSON for more details
-                    const responseBody = await response.json();
-                    errorMessage += `\n${JSON.stringify(responseBody, null, 2)}`;
-                } catch (error) {
-                    // If parsing as JSON fails, use the raw response text
-                    errorMessage += `\n${await response.text()}`;
+            const openai = new OpenAI({
+                apiKey: process.env.OPENAI_API_KEY,
+              });
+            console.log("in image descrption top");
+            const response = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [
+                {
+                "role": "system",
+                "content": "can you look for the sentence bunches where the user is describing some sort of image (does not matter what). Group singular images together. How many images does it seem to be describing - just output the number individually as a digit(s)? "
+                },
+                {
+                "role": "user",
+                "content": input
+                },
+                {
+                "role": "assistant"
+                },
+                {
+                "role": "assistant",
+                "content": "2"
                 }
+            ],
+            temperature: 1,
+            max_tokens: 256,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+            });
+            console.log("in image descrption bottom");
+            // const model = "gpt-4-1106-preview"
+            // // Send a POST request to the API with the prompt in the request body
+            // console.log(input);
+            // //const prompt = "does this presentation have a sentence or phrase that are along the lines of 'this image has'. This is the sentence: "+ + input + "";
+            // //const prompt = "does this content refer to an image or picture at least " + imageAmount + " times? Explain what the two are. Here is the content: " + input;
+            // const prompt = "can you look for the sentence bunches where the user is describing some sort of image (does not matter what). Group singular images together. How many images does it seem to be describing? Output just the number in digit format. Say nothing else except the number. if you are struggling to find image descriptions, output 0. Here is their content: " + input;
+            // const response = await fetch(API_URL + 'get-prompt-result', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({
+            //         prompt,
+            //         model
+            //     })
+            // });
+            // if (!response.ok) {
+            //     setRetryResponse(prompt, uniqueId);
             
-                setErrorForResponse(responseElement, errorMessage);
-                return;
-            }
+            //     // Get additional details from the response
+            //     let errorMessage = `HTTP Error: ${response.status} - ${response.statusText}`;
+            
+            //     try {
+            //         // Attempt to parse the response body as JSON for more details
+            //         const responseBody = await response.json();
+            //         errorMessage += `\n${JSON.stringify(responseBody, null, 2)}`;
+            //     } catch (error) {
+            //         // If parsing as JSON fails, use the raw response text
+            //         errorMessage += `\n${await response.text()}`;
+            //     }
+            
+            //     setErrorForResponse(responseElement, errorMessage);
+            //     return;
+            // }
+
+            console.log("in image descrition portion");
+            console.log(response);
             
             const responseText = await response.text();
-            // if (model === 'image') {
-            //     // Show image for `Create image` model
-            //     responseElement.innerHTML = `<img src="${responseText}" class="ai-image" alt="generated image"/>`
-            // } else {
-                // Set the response text
-                // -- parse and make changes
-                //responseElement.innerHTML = converter.makeHtml(responseText.trim());
+            // // if (model === 'image') {
+            // //     // Show image for `Create image` model
+            // //     responseElement.innerHTML = `<img src="${responseText}" class="ai-image" alt="generated image"/>`
+            // // } else {
+            //     // Set the response text
+            //     // -- parse and make changes
+            //     //responseElement.innerHTML = converter.makeHtml(responseText.trim());
                 console.log(responseText);
                 var resultElement = document.getElementById('result-container');
                 if (resultElement) {
                     resultElement.textContent = responseText;
                 }
-            // }
+            // // }
     
-            // promptToRetry = null;
-            // uniqueIdToRetry = null;
-            // regenerateResponseButton.style.display = 'none';
-            // setTimeout(() => {
-            //     // Scroll to the bottom of the response list
-            //     responseList.scrollTop = responseList.scrollHeight;
-            //     hljs.highlightAll();
-            // }, 10);
+            // // promptToRetry = null;
+            // // uniqueIdToRetry = null;
+            // // regenerateResponseButton.style.display = 'none';
+            // // setTimeout(() => {
+            // //     // Scroll to the bottom of the response list
+            // //     responseList.scrollTop = responseList.scrollHeight;
+            // //     hljs.highlightAll();
+            // // }, 10);
         } catch (err) {
             // setRetryResponse(prompt, uniqueId);
             // // If there's an error, show it in the response element
             // setErrorForResponse(responseElement, `Error: ${err.message}`);
+            console.error("Error:", err);
         } finally {
             // Set isGeneratingResponse to false
             // isGeneratingResponse = false;
