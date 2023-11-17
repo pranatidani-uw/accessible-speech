@@ -1,4 +1,5 @@
-import OpenAI from "openai";
+// import OpenAI from '/npm/openai/index.js';
+
 const API_URL = '/';
 const converter = new showdown.Converter();
 let promptToRetry = null;
@@ -281,6 +282,7 @@ async function getGPTResult(_promptToRetry, _uniqueIdToRetry) {
     // }
     if(imageAmount > 0){
         try {
+            // const OpenAI = require('openai');
             const openai = new OpenAI({
                 apiKey: process.env.OPENAI_API_KEY,
               });
