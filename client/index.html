@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <title>ChatGPT Front-end</title>
@@ -37,5 +37,40 @@
 <script src="./assets/js/highlight.min.js"></script>
 <script src="./assets/js/showdown.min.js"></script>
 <script src="./assets/js/index.js"></script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Simple Form Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+    <div id="form-container">
+        <label>
+            <input type="checkbox" id="imageOption"> Images
+        </label>
+        <!-- Add number input here -->
+        <label for="imageCount">Number of Images:</label>
+        <input type="number" id="imageCount" name="imageCount" min="1" value="1">
+        <br>
+        <label>
+            <input type="checkbox" id="links"> Links
+        </label>
+        <label for="imageCount">Number of :</label>
+        <input type="number" id="linkCount" name="linkCount" min="1" value="1">
+        <br>
+        <label for="text-input">Enter Text:</label>
+        <input type="text" id="text-input" />
+        <br>
+        <button id="submit-button">Submit</button>
+        <br>
+        <div id="result-container"></div>
+    </div>
+    <script src="./assets/js/highlight.min.js"></script>
+    <script src="./assets/js/showdown.min.js"></script>
+    <script src="./assets/js/index.js"></script>
+
 </body>
 </html>

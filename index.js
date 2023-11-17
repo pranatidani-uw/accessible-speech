@@ -59,6 +59,7 @@ app.post('/transcribe', upload.single('audio'), async (req, res) => {
 
 app.post('/get-prompt-result', async (req, res) => {
     // Get the prompt from the request body
+    console.log("in post");
     const {prompt, model = 'gpt'} = req.body;
 
     // Check if prompt is present in the request
