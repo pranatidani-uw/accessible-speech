@@ -14,6 +14,7 @@ var features = {};
 var input;
 var imageAmount= 0;
 var linkAmount = 0;
+var check = false; 
 console.log("hi");
 
 // for parsing checkboxes
@@ -35,6 +36,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
         if (imageCheckbox.checked) {
+            check = true; 
             console.log("Images: Yes " + imageAmount);
             features["image"] = [true, imageAmount]
         } else {
@@ -211,7 +213,7 @@ async function getGPTResult(_promptToRetry, _uniqueIdToRetry) {
     try {
         const model = "chatgpt"
         // Send a POST request to the API with the prompt in the request body
-        const prompt = "does this presentation script have a self introduction where they are describing themselves including name, hair color, clothes, and gender: " + input + ". Answer with yes or no, and what parts they are missing. Be lenient, if they have one or the other it is fine.";
+        const prompt = "does this script have a self introduction where they are describing themselves including name, hair color, clothes, and gender: " + input + ". Answer with yes or no, and what parts they are missing.";
         const response = await fetch(API_URL + 'get-prompt-result', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -276,18 +278,25 @@ async function getGPTResult(_promptToRetry, _uniqueIdToRetry) {
         // // Clear the loader interval
         // clearInterval(loadInterval);
     }
-    if(imageAmount > 0){
         try {
             const model = "chatgpt"
             // Send a POST request to the API with the prompt in the request body
-            
-            const prompt = "no matter what the images are, does this presentation have " +imageAmount + " descriptions for images"+ + input + ". an image description starts with 'this image shows' or something similar how many descriptions they are missing. consider each time the prompt includes 'this image shows' as one image description. you dont need t know what the image looks like. just make sure there's a description of the image that starts with 'this image contains' or smth very similar ";
-            const response = await fetch(API_URL + 'get-prompt-result', {
+            const num = imageAmount;
+            const temperature = 1; // Set the desired temperature value
+            const top_p = 1; // Set the desired top_p value
+            const frequency_penalty = 0; // Set the desired frequency_penalty value
+            const max_tokens = 1000; 
+           const prompt = "does this prompt" + input +" has an existing acronym? do they mention what it stands for? if not, please mention what it stands for"
+           const response = await fetch(API_URL + 'get-prompt-result', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     prompt,
-                    model
+                    model,
+                    temperature,
+                    max_tokens,
+                    top_p,
+                    frequency_penalty
                 })
             });
             if (!response.ok) {
@@ -309,29 +318,13 @@ async function getGPTResult(_promptToRetry, _uniqueIdToRetry) {
                 return;
             }
             
-            const responseText = await response.text();
-            // if (model === 'image') {
-            //     // Show image for `Create image` model
-            //     responseElement.innerHTML = `<img src="${responseText}" class="ai-image" alt="generated image"/>`
-            // } else {
-                // Set the response text
-                // -- parse and make changes
-                //responseElement.innerHTML = converter.makeHtml(responseText.trim());
-                console.log(responseText);
-                var resultElement = document.getElementById('result-container');
+            const responseTextA = await response.text();
+            console.log(responseTextA);
+                var resultElement = document.getElementById('result-container-1');
                 if (resultElement) {
-                    resultElement.textContent = responseText;
+                    resultElement.textContent = responseTextA;
                 }
-            // }
-    
-            // promptToRetry = null;
-            // uniqueIdToRetry = null;
-            // regenerateResponseButton.style.display = 'none';
-            // setTimeout(() => {
-            //     // Scroll to the bottom of the response list
-            //     responseList.scrollTop = responseList.scrollHeight;
-            //     hljs.highlightAll();
-            // }, 10);
+
         } catch (err) {
             // setRetryResponse(prompt, uniqueId);
             // // If there's an error, show it in the response element
@@ -347,6 +340,142 @@ async function getGPTResult(_promptToRetry, _uniqueIdToRetry) {
             // clearInterval(loadInterval);
         }
 
+   // }
+     try {
+        const model = "chatgpt"
+        // Send a POST request to the API with the prompt in the request body
+        const prompt = "does this prompt "+ input + " have a section where the speaker asks if the audience has any questions. Look for phrases like 'any questions?' or similar. Provide details if such a section is present.";
+        const response = await fetch(API_URL + 'get-prompt-result', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                prompt,
+                model
+            })
+        });
+        if (!response.ok) {
+            setRetryResponse(prompt, uniqueId);
+        
+            // Get additional details from the response
+            let errorMessage = `HTTP Error: ${response.status} - ${response.statusText}`;
+        
+            try {
+                // Attempt to parse the response body as JSON for more details
+                const responseBody = await response.json();
+                errorMessage += `\n${JSON.stringify(responseBody, null, 2)}`;
+            } catch (error) {
+                // If parsing as JSON fails, use the raw response text
+                errorMessage += `\n${await response.text()}`;
+            }
+        
+            setErrorForResponse(responseElement, errorMessage);
+            return;
+        }
+        
+        const responseTextB = await response.text();
+        // if (model === 'image') {
+        //     // Show image for `Create image` model
+        //     responseElement.innerHTML = `<img src="${responseText}" class="ai-image" alt="generated image"/>`
+        // } else {
+            // Set the response text
+            // -- parse and make changes
+            //responseElement.innerHTML = converter.makeHtml(responseText.trim());
+            console.log(responseTextB);
+            var resultElement = document.getElementById('result-container-2');
+            if (resultElement) {
+                resultElement.textContent = responseTextB;
+            }
+        // }
+
+        // promptToRetry = null;
+        // uniqueIdToRetry = null;
+        // regenerateResponseButton.style.display = 'none';
+        // setTimeout(() => {
+        //     // Scroll to the bottom of the response list
+        //     responseList.scrollTop = responseList.scrollHeight;
+        //     hljs.highlightAll();
+        // }, 10);
+    } catch (err) {
+        // setRetryResponse(prompt, uniqueId);
+        // // If there's an error, show it in the response element
+        // setErrorForResponse(responseElement, `Error: ${err.message}`);
+    } finally {
+        // Set isGeneratingResponse to false
+        // isGeneratingResponse = false;
+
+        // // Remove the loading class from the submit button
+        // submitButton.classList.remove("loading");
+
+        // // Clear the loader interval
+        // clearInterval(loadInterval);
+    }
+    try {
+        const model = "chatgpt"
+        // Send a POST request to the API with the prompt in the request body
+        const prompt = "does this prompt "+ input + "use offensive words like disabilties. if the prompt does use these words, just tell user to use more inclusive lamguage";
+        const response = await fetch(API_URL + 'get-prompt-result', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                prompt,
+                model
+            })
+        });
+        if (!response.ok) {
+            setRetryResponse(prompt, uniqueId);
+        
+            // Get additional details from the response
+            let errorMessage = `HTTP Error: ${response.status} - ${response.statusText}`;
+        
+            try {
+                // Attempt to parse the response body as JSON for more details
+                const responseBody = await response.json();
+                errorMessage += `\n${JSON.stringify(responseBody, null, 2)}`;
+            } catch (error) {
+                // If parsing as JSON fails, use the raw response text
+                errorMessage += `\n${await response.text()}`;
+            }
+        
+            setErrorForResponse(responseElement, errorMessage);
+            return;
+        }
+        
+        const responseTextC = await response.text();
+        // if (model === 'image') {
+        //     // Show image for `Create image` model
+        //     responseElement.innerHTML = `<img src="${responseText}" class="ai-image" alt="generated image"/>`
+        // } else {
+            // Set the response text
+            // -- parse and make changes
+            //responseElement.innerHTML = converter.makeHtml(responseText.trim());
+            console.log(responseTextC);
+            var resultElement = document.getElementById('result-container-3');
+            if (resultElement) {
+                resultElement.textContent = responseTextC;
+            }
+        // }
+
+        // promptToRetry = null;
+        // uniqueIdToRetry = null;
+        // regenerateResponseButton.style.display = 'none';
+        // setTimeout(() => {
+        //     // Scroll to the bottom of the response list
+        //     responseList.scrollTop = responseList.scrollHeight;
+        //     hljs.highlightAll();
+        // }, 10);
+    } catch (err) {
+        // setRetryResponse(prompt, uniqueId);
+        // // If there's an error, show it in the response element
+        // setErrorForResponse(responseElement, `Error: ${err.message}`);
+    } finally {
+        // Set isGeneratingResponse to false
+        // isGeneratingResponse = false;
+
+        // // Remove the loading class from the submit button
+        // submitButton.classList.remove("loading");
+
+        // // Clear the loader interval
+        // clearInterval(loadInterval);
     }
     
 }
@@ -362,3 +491,4 @@ regenerateResponseButton.addEventListener("click", () => {
 document.addEventListener("DOMContentLoaded", function(){
     promptInput.focus();
 });
+
