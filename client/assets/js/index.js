@@ -25,34 +25,25 @@ document.addEventListener("DOMContentLoaded", function() {
     submitButton.addEventListener("click", function() {
 
         console.log("in submit button listene")
-        var imageCheckbox = document.getElementById("imageOption");
-        var linkCheckbox = document.getElementById("links");
-
+        // var imageCheckbox = document.getElementById("imageOption");
          imageAmount = document.getElementById("imageCount").value;
-         linkAmount = document.getElementById("linkCount").value;
 
         input = document.getElementById("text-input").value;
 
 
 
-        if (imageCheckbox.checked) {
-            check = true; 
-            console.log("Images: Yes " + imageAmount);
-            features["image"] = [true, imageAmount]
-        } else {
-            console.log("Images: No");
-            features["image"] = [false, -1]
-        }
-
-        if (linkCheckbox.checked) {
-            console.log("Links: Yes " + linkAmount);
-            features["link"] = [true, linkAmount]
-        } else {
-            console.log("Links: No");
-            features["link"] = [false, -1]
-        }
+        // if (imageCheckbox.checked) {
+        //     check = true; 
+        //     console.log("Images: Yes " + imageAmount);
+        //     features["image"] = [true, imageAmount]
+        // } else {
+        //     console.log("Images: No");
+        //     features["image"] = [false, -1]
+        // }
 
         getGPTResult();
+        getImageCount();
+        checkSelfIntroduction();
 
     });
 });
@@ -173,47 +164,56 @@ async function getWhisperResult() {
     }
 }
 
+function showTooltip(tooltipId) {
+    document.getElementById(tooltipId).style.display = 'block';
+}
+
+function hideTooltip(tooltipId) {
+    document.getElementById(tooltipId).style.display = 'none';
+}
+
+function getImageCount() {
+
+    var resultElement = document.getElementById('result-container-images');
+
+    if (imageAmount == 0) {
+        resultElement.textContent = "Doesn't seem like you have any images; you are good to go!";
+        return;
+    }
+
+    const lowercasedInput = input.toLowerCase();
+    const lowercasedTargetWord = "image"
+
+    // Use a regular expression to find all occurrences of the target word
+    const regex = new RegExp('\\b' + lowercasedTargetWord + '\\b', 'g');
+    const matches = lowercasedInput.match(regex);
+
+    // Return the count of occurrences
+    const count = matches ? matches.length : 0;
+    
+    
+
+    if (count == imageAmount) {
+        console.log("equal amount");
+        if (resultElement) {
+            resultElement.textContent = "you added in your image descriptions!";
+        }
+    } else {
+        console.log("you might be missing some image descriptions, ensure they are all htere");
+        if (resultElement) {
+            resultElement.textContent = "You might be missing some image descriptions, ensure they are all there";
+        }
+    }
+}
+
+
 // Function to get GPT result
-async function getGPTResult(_promptToRetry, _uniqueIdToRetry) {
-    // if (modelSelect.value === 'whisper') {
-    //     await getWhisperResult();
-    //     return;
-    // }
-    // Get the prompt input
-    // const prompt = _promptToRetry ?? promptInput.textContent;
-
-    // If a response is already being generated or the prompt is empty, return
-    // if (isGeneratingResponse || !prompt) {
-    //     return;
-    // }
-
-    // Add loading class to the submit button
+async function checkSelfIntroduction(_promptToRetry, _uniqueIdToRetry) {
     submitButton.classList.add("loading");
-
-    // Clear the prompt input
-    // promptInput.textContent = '';
-
-    // if (!_uniqueIdToRetry) {
-    //     // Add the prompt to the response list
-    //     addResponse(true, `<div>${prompt}</div>`);
-    // }
-
-    // // Get a unique ID for the response element
-    // const uniqueId = _uniqueIdToRetry ?? addResponse(false);
-
-    // // Get the response element
-    // const responseElement = document.getElementById(uniqueId);
-
-    // // Show the loader
-    // loader(responseElement);
-
-    // // Set isGeneratingResponse to true
-    // isGeneratingResponse = true;
-
     try {
         const model = "chatgpt"
         // Send a POST request to the API with the prompt in the request body
-        const prompt = "does this script have a self introduction where they are describing themselves including name, hair color, clothes, and gender: " + input + ". Answer with yes or no, and what parts they are missing.";
+        const prompt = "does this presentation script have a self introduction where they are describing themselves including name, hair color, clothes, and gender: " + input + ". Answer with yes or no, and what parts they are missing. Be lenient, if they have one or the other it is fine.";
         const response = await fetch(API_URL + 'get-prompt-result', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -242,42 +242,21 @@ async function getGPTResult(_promptToRetry, _uniqueIdToRetry) {
         }
         
         const responseText = await response.text();
-        // if (model === 'image') {
-        //     // Show image for `Create image` model
-        //     responseElement.innerHTML = `<img src="${responseText}" class="ai-image" alt="generated image"/>`
-        // } else {
-            // Set the response text
-            // -- parse and make changes
-            //responseElement.innerHTML = converter.makeHtml(responseText.trim());
             console.log(responseText);
             var resultElement = document.getElementById('result-container');
             if (resultElement) {
                 resultElement.textContent = responseText;
             }
-        // }
-
-        // promptToRetry = null;
-        // uniqueIdToRetry = null;
-        // regenerateResponseButton.style.display = 'none';
-        // setTimeout(() => {
-        //     // Scroll to the bottom of the response list
-        //     responseList.scrollTop = responseList.scrollHeight;
-        //     hljs.highlightAll();
-        // }, 10);
     } catch (err) {
-        // setRetryResponse(prompt, uniqueId);
-        // // If there's an error, show it in the response element
-        // setErrorForResponse(responseElement, `Error: ${err.message}`);
     } finally {
-        // Set isGeneratingResponse to false
-        // isGeneratingResponse = false;
-
-        // // Remove the loading class from the submit button
-        // submitButton.classList.remove("loading");
-
-        // // Clear the loader interval
-        // clearInterval(loadInterval);
     }
+    
+}
+
+// Function to get GPT result
+async function getGPTResult(_promptToRetry, _uniqueIdToRetry) {
+    submitButton.classList.add("loading");
+
         try {
             const model = "chatgpt"
             // Send a POST request to the API with the prompt in the request body
@@ -326,18 +305,7 @@ async function getGPTResult(_promptToRetry, _uniqueIdToRetry) {
                 }
 
         } catch (err) {
-            // setRetryResponse(prompt, uniqueId);
-            // // If there's an error, show it in the response element
-            // setErrorForResponse(responseElement, `Error: ${err.message}`);
         } finally {
-            // Set isGeneratingResponse to false
-            // isGeneratingResponse = false;
-    
-            // // Remove the loading class from the submit button
-            // submitButton.classList.remove("loading");
-    
-            // // Clear the loader interval
-            // clearInterval(loadInterval);
         }
 
    // }
@@ -373,46 +341,18 @@ async function getGPTResult(_promptToRetry, _uniqueIdToRetry) {
         }
         
         const responseTextB = await response.text();
-        // if (model === 'image') {
-        //     // Show image for `Create image` model
-        //     responseElement.innerHTML = `<img src="${responseText}" class="ai-image" alt="generated image"/>`
-        // } else {
-            // Set the response text
-            // -- parse and make changes
-            //responseElement.innerHTML = converter.makeHtml(responseText.trim());
             console.log(responseTextB);
             var resultElement = document.getElementById('result-container-2');
             if (resultElement) {
                 resultElement.textContent = responseTextB;
             }
-        // }
-
-        // promptToRetry = null;
-        // uniqueIdToRetry = null;
-        // regenerateResponseButton.style.display = 'none';
-        // setTimeout(() => {
-        //     // Scroll to the bottom of the response list
-        //     responseList.scrollTop = responseList.scrollHeight;
-        //     hljs.highlightAll();
-        // }, 10);
     } catch (err) {
-        // setRetryResponse(prompt, uniqueId);
-        // // If there's an error, show it in the response element
-        // setErrorForResponse(responseElement, `Error: ${err.message}`);
     } finally {
-        // Set isGeneratingResponse to false
-        // isGeneratingResponse = false;
-
-        // // Remove the loading class from the submit button
-        // submitButton.classList.remove("loading");
-
-        // // Clear the loader interval
-        // clearInterval(loadInterval);
     }
     try {
         const model = "chatgpt"
         // Send a POST request to the API with the prompt in the request body
-        const prompt = "does this prompt "+ input + "use offensive words like disabilties. if the prompt does use these words, just tell user to use more inclusive lamguage";
+        const prompt = "does this prompt "+ input + "use offensive words like disabled people. if the prompt does use these words, just tell user to use more inclusive language. Dont include 'disabled people' in your response too.";
         const response = await fetch(API_URL + 'get-prompt-result', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -441,41 +381,13 @@ async function getGPTResult(_promptToRetry, _uniqueIdToRetry) {
         }
         
         const responseTextC = await response.text();
-        // if (model === 'image') {
-        //     // Show image for `Create image` model
-        //     responseElement.innerHTML = `<img src="${responseText}" class="ai-image" alt="generated image"/>`
-        // } else {
-            // Set the response text
-            // -- parse and make changes
-            //responseElement.innerHTML = converter.makeHtml(responseText.trim());
             console.log(responseTextC);
             var resultElement = document.getElementById('result-container-3');
             if (resultElement) {
                 resultElement.textContent = responseTextC;
             }
-        // }
-
-        // promptToRetry = null;
-        // uniqueIdToRetry = null;
-        // regenerateResponseButton.style.display = 'none';
-        // setTimeout(() => {
-        //     // Scroll to the bottom of the response list
-        //     responseList.scrollTop = responseList.scrollHeight;
-        //     hljs.highlightAll();
-        // }, 10);
     } catch (err) {
-        // setRetryResponse(prompt, uniqueId);
-        // // If there's an error, show it in the response element
-        // setErrorForResponse(responseElement, `Error: ${err.message}`);
     } finally {
-        // Set isGeneratingResponse to false
-        // isGeneratingResponse = false;
-
-        // // Remove the loading class from the submit button
-        // submitButton.classList.remove("loading");
-
-        // // Clear the loader interval
-        // clearInterval(loadInterval);
     }
     
 }
@@ -491,4 +403,3 @@ regenerateResponseButton.addEventListener("click", () => {
 document.addEventListener("DOMContentLoaded", function(){
     promptInput.focus();
 });
-
