@@ -1,11 +1,7 @@
-// import OpenAI from '/npm/openai/index.js';
-
 const API_URL = '/';
 const converter = new showdown.Converter();
 let promptToRetry = null;
 let uniqueIdToRetry = null;
-let OPENAI_API_KEY = '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';
-// const OpenAI = require('openai');
 
 const submitButton = document.getElementById('submit-button');
 const regenerateResponseButton = document.getElementById('regenerate-response-button');
@@ -18,6 +14,7 @@ var features = {};
 var input;
 var imageAmount= 0;
 var linkAmount = 0;
+var check = false; 
 console.log("hi");
 
 // for parsing checkboxes
@@ -39,6 +36,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
         if (imageCheckbox.checked) {
+            check = true; 
             console.log("Images: Yes " + imageAmount);
             features["image"] = [true, imageAmount]
         } else {
@@ -55,6 +53,8 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         getGPTResult();
+        getImageCount();
+        checkSelfIntroduction();
 
     });
 });
@@ -175,219 +175,216 @@ async function getWhisperResult() {
     }
 }
 
+function getImageCount() {
+    const lowercasedInput = input.toLowerCase();
+    const lowercasedTargetWord = "image"
+
+    // Use a regular expression to find all occurrences of the target word
+    const regex = new RegExp('\\b' + lowercasedTargetWord + '\\b', 'g');
+    const matches = lowercasedInput.match(regex);
+
+    // Return the count of occurrences
+    const count = matches ? matches.length : 0;
+    
+    var resultElement = document.getElementById('result-container-images');
+
+    if (count == imageAmount) {
+        console.log("equal amount");
+        if (resultElement) {
+            resultElement.textContent = "you added in your image descriptions!";
+        }
+    } else {
+        console.log("you might be missing some image descriptions, ensure they are all htere");
+        if (resultElement) {
+            resultElement.textContent = "You might be missing some image descriptions, ensure they are all there";
+        }
+    }
+}
+
+
+// Function to get GPT result
+async function checkSelfIntroduction(_promptToRetry, _uniqueIdToRetry) {
+    submitButton.classList.add("loading");
+    if(imageAmount > 0){
+    try {
+        const model = "chatgpt"
+        // Send a POST request to the API with the prompt in the request body
+        const prompt = "does this presentation script have a self introduction where they are describing themselves including name, hair color, clothes, and gender: " + input + ". Answer with yes or no, and what parts they are missing. Be lenient, if they have one or the other it is fine.";
+        const response = await fetch(API_URL + 'get-prompt-result', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                prompt,
+                model
+            })
+        });
+        if (!response.ok) {
+            setRetryResponse(prompt, uniqueId);
+        
+            // Get additional details from the response
+            let errorMessage = `HTTP Error: ${response.status} - ${response.statusText}`;
+        
+            try {
+                // Attempt to parse the response body as JSON for more details
+                const responseBody = await response.json();
+                errorMessage += `\n${JSON.stringify(responseBody, null, 2)}`;
+            } catch (error) {
+                // If parsing as JSON fails, use the raw response text
+                errorMessage += `\n${await response.text()}`;
+            }
+        
+            setErrorForResponse(responseElement, errorMessage);
+            return;
+        }
+        
+        const responseText = await response.text();
+            console.log(responseText);
+            var resultElement = document.getElementById('result-container');
+            if (resultElement) {
+                resultElement.textContent = responseText;
+            }
+    } catch (err) {
+    } finally {
+    }
+    }
+    
+}
+
 // Function to get GPT result
 async function getGPTResult(_promptToRetry, _uniqueIdToRetry) {
-    // if (modelSelect.value === 'whisper') {
-    //     await getWhisperResult();
-    //     return;
-    // }
-    // Get the prompt input
-    // const prompt = _promptToRetry ?? promptInput.textContent;
-
-    // If a response is already being generated or the prompt is empty, return
-    // if (isGeneratingResponse || !prompt) {
-    //     return;
-    // }
-
-    // Add loading class to the submit button
     submitButton.classList.add("loading");
 
-    // Clear the prompt input
-    // promptInput.textContent = '';
-
-    // if (!_uniqueIdToRetry) {
-    //     // Add the prompt to the response list
-    //     addResponse(true, `<div>${prompt}</div>`);
-    // }
-
-    // // Get a unique ID for the response element
-    // const uniqueId = _uniqueIdToRetry ?? addResponse(false);
-
-    // // Get the response element
-    // const responseElement = document.getElementById(uniqueId);
-
-    // // Show the loader
-    // loader(responseElement);
-
-    // // Set isGeneratingResponse to true
-    // isGeneratingResponse = true;
-
-    // try {
-    //     const model = "gpt-4-1106-preview"
-    //     // Send a POST request to the API with the prompt in the request body
-    //     const prompt = "does this presentation script have a self introduction where they are describing themselves including name, hair color, clothes, and gender: " + input + ". Answer with yes or no, and what parts they are missing. Be lenient, if they have one or the other it is fine.";
-    //     const response = await fetch(API_URL + 'get-prompt-result', {
-    //         method: 'POST',
-    //         headers: { 'Content-Type': 'application/json' },
-    //         body: JSON.stringify({
-    //             prompt,
-    //             model
-    //         })
-    //     });
-    //     if (!response.ok) {
-    //         setRetryResponse(prompt, uniqueId);
-        
-    //         // Get additional details from the response
-    //         let errorMessage = `HTTP Error: ${response.status} - ${response.statusText}`;
-        
-    //         try {
-    //             // Attempt to parse the response body as JSON for more details
-    //             const responseBody = await response.json();
-    //             errorMessage += `\n${JSON.stringify(responseBody, null, 2)}`;
-    //         } catch (error) {
-    //             // If parsing as JSON fails, use the raw response text
-    //             errorMessage += `\n${await response.text()}`;
-    //         }
-        
-    //         setErrorForResponse(responseElement, errorMessage);
-    //         return;
-    //     }
-        
-    //     const responseText = await response.text();
-    //     // if (model === 'image') {
-    //     //     // Show image for `Create image` model
-    //     //     responseElement.innerHTML = `<img src="${responseText}" class="ai-image" alt="generated image"/>`
-    //     // } else {
-    //         // Set the response text
-    //         // -- parse and make changes
-    //         //responseElement.innerHTML = converter.makeHtml(responseText.trim());
-    //         console.log(responseText);
-    //         var resultElement = document.getElementById('result-container');
-    //         if (resultElement) {
-    //             resultElement.textContent = responseText;
-    //         }
-    //     // }
-
-    //     // promptToRetry = null;
-    //     // uniqueIdToRetry = null;
-    //     // regenerateResponseButton.style.display = 'none';
-    //     // setTimeout(() => {
-    //     //     // Scroll to the bottom of the response list
-    //     //     responseList.scrollTop = responseList.scrollHeight;
-    //     //     hljs.highlightAll();
-    //     // }, 10);
-    // } catch (err) {
-    //     // setRetryResponse(prompt, uniqueId);
-    //     // // If there's an error, show it in the response element
-    //     // setErrorForResponse(responseElement, `Error: ${err.message}`);
-    // } finally {
-    //     // Set isGeneratingResponse to false
-    //     // isGeneratingResponse = false;
-
-    //     // // Remove the loading class from the submit button
-    //     // submitButton.classList.remove("loading");
-
-    //     // // Clear the loader interval
-    //     // clearInterval(loadInterval);
-    // }
-    if(imageAmount > 0){
         try {
-            // const OpenAI = require('openai');
-            const openai = new OpenAI({
-                apiKey: process.env.OPENAI_API_KEY,
-              });
-            console.log("in image descrption top");
-            const response = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            messages: [
-                {
-                "role": "system",
-                "content": "can you look for the sentence bunches where the user is describing some sort of image (does not matter what). Group singular images together. How many images does it seem to be describing - just output the number individually as a digit(s)? "
-                },
-                {
-                "role": "user",
-                "content": input
-                },
-                {
-                "role": "assistant"
-                },
-                {
-                "role": "assistant",
-                "content": "2"
-                }
-            ],
-            temperature: 1,
-            max_tokens: 256,
-            top_p: 1,
-            frequency_penalty: 0,
-            presence_penalty: 0,
+            const model = "chatgpt"
+            // Send a POST request to the API with the prompt in the request body
+            const num = imageAmount;
+            const temperature = 1; // Set the desired temperature value
+            const top_p = 1; // Set the desired top_p value
+            const frequency_penalty = 0; // Set the desired frequency_penalty value
+            const max_tokens = 1000; 
+           const prompt = "does this prompt" + input +" has an existing acronym? do they mention what it stands for? if not, please mention what it stands for"
+           const response = await fetch(API_URL + 'get-prompt-result', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    prompt,
+                    model,
+                    temperature,
+                    max_tokens,
+                    top_p,
+                    frequency_penalty
+                })
             });
-            console.log("in image descrption bottom");
-            // const model = "gpt-4-1106-preview"
-            // // Send a POST request to the API with the prompt in the request body
-            // console.log(input);
-            // //const prompt = "does this presentation have a sentence or phrase that are along the lines of 'this image has'. This is the sentence: "+ + input + "";
-            // //const prompt = "does this content refer to an image or picture at least " + imageAmount + " times? Explain what the two are. Here is the content: " + input;
-            // const prompt = "can you look for the sentence bunches where the user is describing some sort of image (does not matter what). Group singular images together. How many images does it seem to be describing? Output just the number in digit format. Say nothing else except the number. if you are struggling to find image descriptions, output 0. Here is their content: " + input;
-            // const response = await fetch(API_URL + 'get-prompt-result', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({
-            //         prompt,
-            //         model
-            //     })
-            // });
-            // if (!response.ok) {
-            //     setRetryResponse(prompt, uniqueId);
+            if (!response.ok) {
+                setRetryResponse(prompt, uniqueId);
             
-            //     // Get additional details from the response
-            //     let errorMessage = `HTTP Error: ${response.status} - ${response.statusText}`;
+                // Get additional details from the response
+                let errorMessage = `HTTP Error: ${response.status} - ${response.statusText}`;
             
-            //     try {
-            //         // Attempt to parse the response body as JSON for more details
-            //         const responseBody = await response.json();
-            //         errorMessage += `\n${JSON.stringify(responseBody, null, 2)}`;
-            //     } catch (error) {
-            //         // If parsing as JSON fails, use the raw response text
-            //         errorMessage += `\n${await response.text()}`;
-            //     }
-            
-            //     setErrorForResponse(responseElement, errorMessage);
-            //     return;
-            // }
-
-            console.log("in image descrition portion");
-            console.log(response);
-            
-            const responseText = await response.text();
-            // // if (model === 'image') {
-            // //     // Show image for `Create image` model
-            // //     responseElement.innerHTML = `<img src="${responseText}" class="ai-image" alt="generated image"/>`
-            // // } else {
-            //     // Set the response text
-            //     // -- parse and make changes
-            //     //responseElement.innerHTML = converter.makeHtml(responseText.trim());
-                console.log(responseText);
-                var resultElement = document.getElementById('result-container');
-                if (resultElement) {
-                    resultElement.textContent = responseText;
+                try {
+                    // Attempt to parse the response body as JSON for more details
+                    const responseBody = await response.json();
+                    errorMessage += `\n${JSON.stringify(responseBody, null, 2)}`;
+                } catch (error) {
+                    // If parsing as JSON fails, use the raw response text
+                    errorMessage += `\n${await response.text()}`;
                 }
-            // // }
-    
-            // // promptToRetry = null;
-            // // uniqueIdToRetry = null;
-            // // regenerateResponseButton.style.display = 'none';
-            // // setTimeout(() => {
-            // //     // Scroll to the bottom of the response list
-            // //     responseList.scrollTop = responseList.scrollHeight;
-            // //     hljs.highlightAll();
-            // // }, 10);
+            
+                setErrorForResponse(responseElement, errorMessage);
+                return;
+            }
+            
+            const responseTextA = await response.text();
+            console.log(responseTextA);
+                var resultElement = document.getElementById('result-container-1');
+                if (resultElement) {
+                    resultElement.textContent = responseTextA;
+                }
+
         } catch (err) {
-            // setRetryResponse(prompt, uniqueId);
-            // // If there's an error, show it in the response element
-            // setErrorForResponse(responseElement, `Error: ${err.message}`);
-            console.error("Error:", err);
         } finally {
-            // Set isGeneratingResponse to false
-            // isGeneratingResponse = false;
-    
-            // // Remove the loading class from the submit button
-            // submitButton.classList.remove("loading");
-    
-            // // Clear the loader interval
-            // clearInterval(loadInterval);
         }
 
+   // }
+     try {
+        const model = "chatgpt"
+        // Send a POST request to the API with the prompt in the request body
+        const prompt = "does this prompt "+ input + " have a section where the speaker asks if the audience has any questions. Look for phrases like 'any questions?' or similar. Provide details if such a section is present.";
+        const response = await fetch(API_URL + 'get-prompt-result', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                prompt,
+                model
+            })
+        });
+        if (!response.ok) {
+            setRetryResponse(prompt, uniqueId);
+        
+            // Get additional details from the response
+            let errorMessage = `HTTP Error: ${response.status} - ${response.statusText}`;
+        
+            try {
+                // Attempt to parse the response body as JSON for more details
+                const responseBody = await response.json();
+                errorMessage += `\n${JSON.stringify(responseBody, null, 2)}`;
+            } catch (error) {
+                // If parsing as JSON fails, use the raw response text
+                errorMessage += `\n${await response.text()}`;
+            }
+        
+            setErrorForResponse(responseElement, errorMessage);
+            return;
+        }
+        
+        const responseTextB = await response.text();
+            console.log(responseTextB);
+            var resultElement = document.getElementById('result-container-2');
+            if (resultElement) {
+                resultElement.textContent = responseTextB;
+            }
+    } catch (err) {
+    } finally {
+    }
+    try {
+        const model = "chatgpt"
+        // Send a POST request to the API with the prompt in the request body
+        const prompt = "does this prompt "+ input + "use offensive words like disabilties. if the prompt does use these words, just tell user to use more inclusive lamguage";
+        const response = await fetch(API_URL + 'get-prompt-result', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                prompt,
+                model
+            })
+        });
+        if (!response.ok) {
+            setRetryResponse(prompt, uniqueId);
+        
+            // Get additional details from the response
+            let errorMessage = `HTTP Error: ${response.status} - ${response.statusText}`;
+        
+            try {
+                // Attempt to parse the response body as JSON for more details
+                const responseBody = await response.json();
+                errorMessage += `\n${JSON.stringify(responseBody, null, 2)}`;
+            } catch (error) {
+                // If parsing as JSON fails, use the raw response text
+                errorMessage += `\n${await response.text()}`;
+            }
+        
+            setErrorForResponse(responseElement, errorMessage);
+            return;
+        }
+        
+        const responseTextC = await response.text();
+            console.log(responseTextC);
+            var resultElement = document.getElementById('result-container-3');
+            if (resultElement) {
+                resultElement.textContent = responseTextC;
+            }
+    } catch (err) {
+    } finally {
     }
     
 }
@@ -403,3 +400,4 @@ regenerateResponseButton.addEventListener("click", () => {
 document.addEventListener("DOMContentLoaded", function(){
     promptInput.focus();
 });
+
