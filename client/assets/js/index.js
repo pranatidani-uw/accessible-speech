@@ -25,32 +25,21 @@ document.addEventListener("DOMContentLoaded", function() {
     submitButton.addEventListener("click", function() {
 
         console.log("in submit button listene")
-        var imageCheckbox = document.getElementById("imageOption");
-        var linkCheckbox = document.getElementById("links");
-
+        // var imageCheckbox = document.getElementById("imageOption");
          imageAmount = document.getElementById("imageCount").value;
-         linkAmount = document.getElementById("linkCount").value;
 
         input = document.getElementById("text-input").value;
 
 
 
-        if (imageCheckbox.checked) {
-            check = true; 
-            console.log("Images: Yes " + imageAmount);
-            features["image"] = [true, imageAmount]
-        } else {
-            console.log("Images: No");
-            features["image"] = [false, -1]
-        }
-
-        if (linkCheckbox.checked) {
-            console.log("Links: Yes " + linkAmount);
-            features["link"] = [true, linkAmount]
-        } else {
-            console.log("Links: No");
-            features["link"] = [false, -1]
-        }
+        // if (imageCheckbox.checked) {
+        //     check = true; 
+        //     console.log("Images: Yes " + imageAmount);
+        //     features["image"] = [true, imageAmount]
+        // } else {
+        //     console.log("Images: No");
+        //     features["image"] = [false, -1]
+        // }
 
         getGPTResult();
         getImageCount();
@@ -175,7 +164,23 @@ async function getWhisperResult() {
     }
 }
 
+function showTooltip(tooltipId) {
+    document.getElementById(tooltipId).style.display = 'block';
+}
+
+function hideTooltip(tooltipId) {
+    document.getElementById(tooltipId).style.display = 'none';
+}
+
 function getImageCount() {
+
+    var resultElement = document.getElementById('result-container-images');
+
+    if (imageAmount == 0) {
+        resultElement.textContent = "Doesn't seem like you have any images; you are good to go!";
+        return;
+    }
+
     const lowercasedInput = input.toLowerCase();
     const lowercasedTargetWord = "image"
 
@@ -186,7 +191,7 @@ function getImageCount() {
     // Return the count of occurrences
     const count = matches ? matches.length : 0;
     
-    var resultElement = document.getElementById('result-container-images');
+    
 
     if (count == imageAmount) {
         console.log("equal amount");
@@ -205,7 +210,6 @@ function getImageCount() {
 // Function to get GPT result
 async function checkSelfIntroduction(_promptToRetry, _uniqueIdToRetry) {
     submitButton.classList.add("loading");
-    if(imageAmount > 0){
     try {
         const model = "chatgpt"
         // Send a POST request to the API with the prompt in the request body
@@ -245,7 +249,6 @@ async function checkSelfIntroduction(_promptToRetry, _uniqueIdToRetry) {
             }
     } catch (err) {
     } finally {
-    }
     }
     
 }
