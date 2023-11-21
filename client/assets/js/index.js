@@ -201,7 +201,7 @@ function getImageCount() {
     } else {
         console.log("you might be missing some image descriptions, ensure they are all htere");
         if (resultElement) {
-            resultElement.textContent = "You might be missing some image descriptions, ensure they are all there";
+            resultElement.textContent = "It seems you are missing some image descriptions, ensure they are all there";
         }
     }
 }

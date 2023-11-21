@@ -76,7 +76,15 @@
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            background-color: #f9f9f9;
+            background-color: #dedede;
+        }
+
+        .helpful-tips {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f0d5d5;
         }
 
         .info-icon {
@@ -109,22 +117,86 @@
             padding: 10px;
             max-width: 300px;
             z-index: 1;
-            
+            left:0;
+            right:0;
+        }
+
+        .tooltip1 {
+            position: relative;
+            display: none;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            padding: 10px;
+            max-width: 300px;
+            z-index: 1;
+            left:0;
+            right:0;
+        }
+
+        .tooltip2 {
+            position: absolute;
+            display: none;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            padding: 10px;
+            max-width: 300px;
+            z-index: 1;
+            left:0;
+            right:0;
+        }
+
+        .tooltip3 {
+            position: absolute;
+            display: none;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            padding: 10px;
+            max-width: 300px;
+            z-index: 1;
+        }
+
+        .tooltip4 {
+            position: absolute;
+            display: none;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            padding: 10px;
+            max-width: 300px;
+            z-index: 1;
+        }
+        .image-count-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        }
+
+        #imageCount {
+        margin-left: 10px;
+        width: 50px;
         }
     </style>
 </head>
 
 <body>
     <div id="form-container">
-        <h1>Check if your script is accessible</h1>
+        <h1>Accessible Presentation Script Scan</h1>
+        <div>It is not only important to have an accessible slide deck, but also a speech that is accessible. This will help ensure that your speech is geared towards all types of audiences, and can be understood by everyone. Simply enter in your script below and let us know how many images your presentation has. We will provide you an analysis in just a few seconds of the accessibility of your speech. <div>
+        <br>
+        <div>To read more about what can make your script more accessible, feel free to read this website on some <a href="https://www.washington.edu/doit/tips-delivering-accessible-presentation">accessible presentation guidelines.</a><div>
+    
         <br>
         <label for="text-input">Enter Script:</label>
-        <input type="textarea" id="text-input" placeholder="Type your text here...">
+        <textarea cols="20" rows="5" wrap="hard" placeholder="Type your text here..." id="text-input"></textarea>
         <br>
-        <label>
-            Image Count
-        </label>
-        <input type="number" id="imageCount" name="imageCount" min="1" value="1">
+        <br>
+        <div class="image-count-container">
+            <label for="imageCount">Image Count:</label>
+            <input type="number" id="imageCount" name="imageCount" min="1" value="1">
+        </div>
         <br>
         <button id="submit-button">Check</button>
         <br>
@@ -134,35 +206,46 @@
             <span class="info-icon" onmouseover="showTooltip('tooltipIntro')" onmouseout="hideTooltip('tooltipIntro')"></span>
         </label>
         <div id="tooltipIntro" class="tooltip">add in WCAG guidelines/more info</div>
-        <div id="result-container"></div>
+        <div class="result-box" id="result-container"></div>
         <br>
         <label>
             Acronym Scan
             <span class="info-icon" onmouseover="showTooltip('tooltipIntro')" onmouseout="hideTooltip('tooltipIntro')"></span>
         </label>
-        <div id="tooltipIntro" class="tooltip">add in WCAG guidelines/more info</div>
+        <div id="tooltipAcronym" class="tooltip1">add in WCAG guidelines/more info</div>
         <div class="result-box" id="result-container-1"></div>
         <br>
         <label>
             Conclusion Checker
             <span class="info-icon" onmouseover="showTooltip('tooltipIntro')" onmouseout="hideTooltip('tooltipIntro')"></span>
         </label>
-        <div id="tooltipIntro" class="tooltip">add in WCAG guidelines/more info</div>
+        <div id="tooltipConclusion" class="tooltip2">add in WCAG guidelines/more info</div>
         <div class="result-box" id="result-container-2"></div>
         <br>
         <label>
             Offensive Phrases Scan
             <span class="info-icon" onmouseover="showTooltip('tooltipIntro')" onmouseout="hideTooltip('tooltipIntro')"></span>
         </label>
-        <div id="tooltipIntro" class="tooltip">add in WCAG guidelines/more info</div>
+        <div id="tooltipOffensive" class="tooltip3">add in WCAG guidelines/more info</div>
         <div class="result-box" id="result-container-3"></div>
         <br>
         <label>
             Image Description Checker
             <span class="info-icon" onmouseover="showTooltip('tooltipIntro')" onmouseout="hideTooltip('tooltipIntro')"></span>
         </label>
-        <div id="tooltipIntro" class="tooltip">add in WCAG guidelines/more info</div>
+        <div id="tooltipImage" class="tooltip4">add in WCAG guidelines/more info</div>
         <div class="result-box" id="result-container-images"></div>
+        <br>
+        <div class="helpful-tips" id="helpful-tips">
+
+            <h3><b>Some tips to remember before the presentation:</b></h3>
+                <li>Speak slowly and clearly</li>
+                <li>Remember to repeat questions when asked</li>
+                <li>Ensure captioning is on</li>
+                <li>Ensure everyone can hear you</li>
+                <li>Try to hand out a copy of your presentation</li>
+
+        </div>
     </div>
     <script src="./assets/js/highlight.min.js"></script>
     <script src="./assets/js/showdown.min.js"></script>
