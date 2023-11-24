@@ -250,6 +250,31 @@
     <script src="./assets/js/highlight.min.js"></script>
     <script src="./assets/js/showdown.min.js"></script>
     <script src="./assets/js/index.js"></script>
+
+
+    <script>
+        document.addEventListener('mouseover', function (e) {
+    if (e.target.classList.contains('info-icon')) {
+        var tooltipId = e.target.getAttribute('onmouseover').replace("showTooltip('", "").replace("')", "");
+        var tooltip = document.getElementById(tooltipId);
+        var scrollX = window.scrollX;
+        var scrollY = window.scrollY;
+        tooltip.style.left = (e.clientX + scrollX) + 'px';
+        tooltip.style.top = (e.clientY + scrollY) + 'px';
+        tooltip.style.display = 'block';
+    }
+});
+
+document.addEventListener('mouseout', function (e) {
+    if (e.target.classList.contains('info-icon')) {
+        var tooltipId = e.target.getAttribute('onmouseout').replace("hideTooltip('", "").replace("')", "");
+        var tooltip = document.getElementById(tooltipId);
+        tooltip.style.display = 'none';
+    }
+});
+
+    </script>
+
 </body>
 
 </html>
