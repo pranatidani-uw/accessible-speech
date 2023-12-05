@@ -63,13 +63,13 @@
             background-color: #45a049;
         }
 
-        #result-container {
+        /* #result-container {
             margin-top: 20px;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
             background-color: #f9f9f9;
-        }
+        } */
 
         .result-box {
             margin-top: 20px;
@@ -122,7 +122,7 @@
         }
 
         .tooltip1 {
-            position: relative;
+            position: absolute;
             display: none;
             background-color: #fff;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -183,6 +183,8 @@
 
 <body>
     <div id="form-container">
+        
+        <img src="./assets/img/logo.png" alt="Logo of speechIT with a Mic and circle and lines around it, along with the text, speechIT">
         <h1>Accessible Presentation Script Scan</h1>
         <div>It is not only important to have an accessible slide deck, but also a speech that is accessible. This will help ensure that your speech is geared towards all types of audiences, and can be understood by everyone. Simply enter in your script below and let us know how many images your presentation has. We will provide you an analysis in just a few seconds of the accessibility of your speech. <div>
         <br>
@@ -205,33 +207,36 @@
             Introduction Checker
             <span class="info-icon" onmouseover="showTooltip('tooltipIntro')" onmouseout="hideTooltip('tooltipIntro')"></span>
         </label>
-        <div id="tooltipIntro" class="tooltip">add in WCAG guidelines/more info</div>
+        <div id="tooltipIntro" class="tooltip">According to Disability Philanthropy, when you start a speech, to offer context and access for all, provide a brief (a few sentences) visual description of yourself. You may choose to describe your gender identity, race or ethnicity, skin color, hair color and style, whether you have facial hair, what clothing and jewelry you're wearing, and a short description of your background.</div>
         <div class="result-box" id="result-container"></div>
         <br>
         <label>
             Acronym Scan
-            <span class="info-icon" onmouseover="showTooltip('tooltipIntro')" onmouseout="hideTooltip('tooltipIntro')"></span>
+            <span class="info-icon" onmouseover="showTooltip('tooltipAcronym')" onmouseout="hideTooltip('tooltipAcronym')"></span>
         </label>
-        <div id="tooltipAcronym" class="tooltip1">adds in WCAG guidelines/more info</div>
+        <div id="tooltipAcronym" class="tooltip1">As StyleManual.Gov states, it is important to define acronyms the first time you use them in content (unless you're certain all users will understand them without a definition – consult a dictionary first). Include them with their spelt-out forms in the glossary. This is particularly important if the content contains many specialist shortened forms.</div>
         <div class="result-box" id="result-container-1"></div>
         <br>
         <label>
             Conclusion Checker
-            <span class="info-icon" onmouseover="showTooltip('tooltipIntro')" onmouseout="hideTooltip('tooltipIntro')"></span>
+            <span class="info-icon" onmouseover="showTooltip('tooltipConclusion')" onmouseout="hideTooltip('tooltipConclusion')"></span>
         </label>
-        <div id="tooltipConclusion" class="tooltip2">add in WCAG guidelines/more info</div>
+        <div id="tooltipConclusion" class="tooltip2">Asking for questions at the end of a speech is very important, as mentioned multiple times throughout class. It is also important to repeat questions asked so that everyone can hear and understand.</div>
         <div class="result-box" id="result-container-2"></div>
         <br>
         <label>
             Offensive Phrases Scan
-            <span class="info-icon" onmouseover="showTooltip('tooltipIntro')" onmouseout="hideTooltip('tooltipIntro')"></span>
+            <span class="info-icon" onmouseover="showTooltip('tooltipOffensive')" onmouseout="hideTooltip('tooltipOffensive')"></span>
         </label>
-        <div id="tooltipOffensive" class="tooltip3">add in WCAG guidelines/more info</div>
+        <div id="tooltipOffensive" class="tooltip3">According to the National Youth Research Network, It’s important that
+            people are aware of the meaning behind the words they use when talking to, referring
+            to, or working with the Disability Community. Disrespectful language can make people
+            feel excluded and can be a barrier to full participation. </div>
         <div class="result-box" id="result-container-3"></div>
         <br>
         <label>
             Images Description Checker
-            <span class="info-icon" onmouseover="showTooltip('tooltipImage')" onmouseout="hideTooltip('tooltipIntro')"></span>
+            <span class="info-icon" onmouseover="showTooltip('tooltipImage')" onmouseout="hideTooltip('tooltipImage')"></span>
         </label>
         <div id="tooltipImage" class="tooltip4">Understanding Success Criteria 1.1.1 (Non-text Content) WCAG 2.0 requirements for alternative text that includes techniques for meeting this Success Criteria.The Web Content Accessibility Guidelines (WCAG) 2.0 is a comprehensive set of recommendations for making content accessible to a broad range of people with disabilities. Guideline 1.1.1 covers the accessibility of all Non-text Content, including images, form controls, media and sensory content.</div>
         <div class="result-box" id="result-container-images"></div>
